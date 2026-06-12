@@ -1,0 +1,176 @@
+{
+  "info": {
+    "name": "Parcial 2 Arquisoft - Proyectos y Empleados",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "accept",
+      "value": "application/vnd.parcial.v1+json"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('response.status = UP', () => pm.expect(pm.response.json().status).to.eql('UP'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar proyectos por cedula",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "{{accept}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/proyectos?cedula=1001234567"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('existe empleado', () => pm.expect(json.empleado).to.be.an('object'));",
+              "pm.test('existe proyectos', () => pm.expect(json.proyectos).to.be.an('array'));",
+              "pm.test('existe _links', () => pm.expect(json._links).to.be.an('object'));",
+              "pm.test('cantidadProyectos >= 1', () => pm.expect(json.cantidadProyectos).to.be.at.least(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar empleado inexistente",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "{{accept}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/proyectos?cedula=999999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar sin cedula",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "{{accept}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/proyectos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crear proyecto con empleados",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "{{accept}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/proyectos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PRY-004\",\n  \"nombre\": \"Sistema de Gestion Documental\",\n  \"descripcion\": \"Sistema para administrar documentos internos de la empresa.\",\n  \"fechaInicio\": \"2026-06-15\",\n  \"fechaFin\": \"2026-09-30\",\n  \"estado\": \"ACTIVO\",\n  \"presupuesto\": 12000000,\n  \"empleados\": [\n    {\n      \"cedula\": \"1001234567\",\n      \"nombre\": \"Santiago\",\n      \"apellido\": \"Palacio\",\n      \"correo\": \"santiago.palacio@empresa.com\",\n      \"cargo\": \"Desarrollador Backend\",\n      \"area\": \"Tecnologia\",\n      \"rolEnProyecto\": \"Desarrollador Principal\",\n      \"fechaAsignacion\": \"2026-06-15\"\n    },\n    {\n      \"cedula\": \"1004567890\",\n      \"nombre\": \"Jimena\",\n      \"apellido\": \"Munoz\",\n      \"correo\": \"jimena.munoz@empresa.com\",\n      \"cargo\": \"Disenadora Frontend\",\n      \"area\": \"Producto\",\n      \"rolEnProyecto\": \"Disenadora UI\",\n      \"fechaAsignacion\": \"2026-06-15\"\n    }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('existe id', () => pm.expect(json.id).to.exist);",
+              "pm.test('existe _links', () => pm.expect(json._links).to.be.an('object'));",
+              "pm.test('existe Location header', () => pm.expect(pm.response.headers.get('Location')).to.exist);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crear proyecto duplicado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "{{accept}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/proyectos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PRY-004\",\n  \"nombre\": \"Sistema de Gestion Documental\",\n  \"descripcion\": \"Sistema para administrar documentos internos de la empresa.\",\n  \"fechaInicio\": \"2026-06-15\",\n  \"fechaFin\": \"2026-09-30\",\n  \"estado\": \"ACTIVO\",\n  \"presupuesto\": 12000000,\n  \"empleados\": [\n    {\n      \"cedula\": \"1001234567\",\n      \"nombre\": \"Santiago\",\n      \"apellido\": \"Palacio\",\n      \"correo\": \"santiago.palacio@empresa.com\",\n      \"cargo\": \"Desarrollador Backend\",\n      \"area\": \"Tecnologia\",\n      \"rolEnProyecto\": \"Desarrollador Principal\",\n      \"fechaAsignacion\": \"2026-06-15\"\n    }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

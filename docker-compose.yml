@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: parcial-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require
+      SPRING_DATASOURCE_USERNAME: postgres.nwghyyacoflihtacamip
+      SPRING_DATASOURCE_PASSWORD: parcial-2-arquisoft-ssjj
+
+  front-end:
+    build:
+      context: ./front-end
+      args:
+        VITE_API_URL: http://localhost:8080
+        VITE_API_ACCEPT: application/vnd.parcial.v1+json
+    container_name: parcial-front-end
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
