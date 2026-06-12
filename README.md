@@ -198,6 +198,42 @@ Accept: application/vnd.parcial.v1+json
 
 Importar `postman/parcial-2-arquisoft.postman_collection.json`. La coleccion incluye health check, consulta exitosa, consulta sin cedula, empleado inexistente, creacion de proyecto y proyecto duplicado.
 
+## Despliegue del frontend en Vercel
+
+Configuracion recomendada en Vercel:
+
+- Root Directory: `front-end`
+- Framework Preset: `Vite`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+
+Variables de entorno:
+
+```env
+VITE_API_URL=https://parcial-2-arquisoft-ssjj.onrender.com
+VITE_API_ACCEPT=application/vnd.parcial.v1+json
+```
+
+El frontend queda preparado como SPA Vite estatica: `front-end/index.html` carga `src/main.tsx`, el build genera `front-end/dist/index.html` y `front-end/dist/assets/`. El archivo `front-end/vercel.json` define framework, build, output y rewrite hacia `index.html`.
+
+Si la configuracion con Root Directory falla, usar la estrategia alternativa:
+
+- Root Directory: vacio
+- Build Command: `cd front-end && npm install && npm run build`
+- Output Directory: `front-end/dist`
+- Install Command: `echo install handled in buildCommand`
+
+Esta alternativa queda respaldada por `vercel.json` en la raiz del repositorio.
+
+Si Vercel muestra `404: NOT_FOUND`, verificar:
+
+- Que `front-end/dist/index.html` exista despues de `npm run build`.
+- Que Root Directory apunte a `front-end` si se usa la opcion recomendada.
+- Que Output Directory sea `dist` si Root Directory es `front-end`.
+- Que `vercel.json` este en la ubicacion correcta para la estrategia elegida.
+- Que el deploy se haya hecho despues del ultimo `git push`.
+
 ## Solucion a error de conexiones Supabase en Render
 
 En Render el backend puede fallar si Supabase rechaza nuevas sesiones con `EMAXCONNSESSION max clients reached in session mode`. Para evitarlo se configuro HikariCP con un maximo de 2 conexiones, `minimum-idle=0` y tiempos de vida cortos. Tambien se fijo el dialecto PostgreSQL para que Hibernate no dependa de leer metadata JDBC durante un fallo temporal de conexion.

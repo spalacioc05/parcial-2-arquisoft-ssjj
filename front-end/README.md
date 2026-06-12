@@ -1,9 +1,8 @@
-# Gestión de Proyectos Empresariales — Frontend
+# Gestion de Proyectos Empresariales - Frontend
 
-Frontend del Parcial 2 de Arquitectura de Software. Consume una API REST en
-Spring Boot que gestiona proyectos y empleados.
+Frontend del Parcial 2 de Arquitectura de Software. Consume una API REST en Spring Boot que gestiona proyectos y empleados.
 
-## Instalación
+## Instalacion
 
 ```bash
 npm install
@@ -15,7 +14,7 @@ npm install
 npm run dev
 ```
 
-Abre http://localhost:3000.
+Abre `http://localhost:3000`.
 
 ## Compilar
 
@@ -23,42 +22,69 @@ Abre http://localhost:3000.
 npm run build
 ```
 
+El build para Vercel debe generar:
+
+```text
+dist/index.html
+dist/assets/
+```
+
+## Preview local
+
+```bash
+npm run preview
+```
+
+Abre `http://localhost:3000`.
+
 ## Variables de entorno
 
-Crear un archivo `.env` (o `.env.local`) en la raíz:
+Para Vercel:
 
-```
-VITE_API_URL=http://localhost:8080
+```env
+VITE_API_URL=https://parcial-2-arquisoft-ssjj.onrender.com
 VITE_API_ACCEPT=application/vnd.parcial.v1+json
 ```
 
-Si no se definen, se usan esos mismos valores por defecto.
-
-El puerto `3000` es solo para el frontend. La API del backend sigue en
-`http://localhost:8080`.
+Si no se definen, el codigo usa `http://localhost:8080` como fallback para desarrollo local.
 
 ## Endpoints consumidos
 
-- `GET  /api/health` — verifica disponibilidad del backend.
-- `GET  /api/proyectos?cedula={cedula}` — proyectos asignados a un empleado.
-- `POST /api/proyectos` — crear proyecto con empleados.
-- `GET  /swagger-ui/index.html` — documentación Swagger (enlace).
+- `GET /api/health`
+- `GET /api/proyectos?cedula={cedula}`
+- `POST /api/proyectos`
+- `GET /api/proyectos/{id}`
+- `GET /swagger-ui/index.html`
 
-## Header Accept requerido
+Todas las peticiones principales envian:
 
-Todas las peticiones envían:
-
-```
+```http
 Accept: application/vnd.parcial.v1+json
 ```
 
-Las peticiones `POST` además envían `Content-Type: application/json`.
-El versionamiento se maneja por Accept Header (no por `/api/v1`).
+Las peticiones `POST` tambien envian:
 
-## Probar con el backend
+```http
+Content-Type: application/json
+```
 
-1. Levanta el backend Spring Boot en `http://localhost:8080`.
-2. Ejecuta `npm run dev`.
-3. En la sección **Documentación y utilidades** pulsa **Probar Health Check**.
-4. En **Consultar proyectos** usa la cédula de prueba `1001234567`.
-5. En **Crear nuevo proyecto** usa **Cargar ejemplo** para autocompletar.
+## Vercel
+
+Configuracion recomendada:
+
+- Root Directory: `front-end`
+- Framework Preset: `Vite`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+
+El archivo `vercel.json` incluye el rewrite de SPA hacia `/index.html`.
+
+Alternativa si Vercel no lee la configuracion con Root Directory:
+
+- Root Directory: vacio
+- Build Command: `cd front-end && npm install && npm run build`
+- Output Directory: `front-end/dist`
+- Install Command: `echo install handled in buildCommand`
+
+La alternativa usa el `vercel.json` de la raiz del repositorio.
