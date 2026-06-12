@@ -74,9 +74,16 @@ Copiar `.env.example` a `.env` si se desea ejecutar con variables locales.
 
 ```env
 SERVER_PORT=8080
-SPRING_DATASOURCE_URL=jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require
+SPRING_DATASOURCE_URL=jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require&prepareThreshold=0
 SPRING_DATASOURCE_USERNAME=postgres.nwghyyacoflihtacamip
 SPRING_DATASOURCE_PASSWORD=parcial-2-arquisoft-ssjj
+SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=2
+SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=0
+SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT=10000
+SPRING_DATASOURCE_HIKARI_MAX_LIFETIME=30000
+SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=30000
+SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT=5000
+FRONTEND_URL=https://parcial-2-arquisoft-ssjj.vercel.app
 VITE_API_URL=http://localhost:8080
 VITE_API_ACCEPT=application/vnd.parcial.v1+json
 ```
@@ -190,6 +197,47 @@ Accept: application/vnd.parcial.v1+json
 ## Postman
 
 Importar `postman/parcial-2-arquisoft.postman_collection.json`. La coleccion incluye health check, consulta exitosa, consulta sin cedula, empleado inexistente, creacion de proyecto y proyecto duplicado.
+
+## Solucion a error de conexiones Supabase en Render
+
+En Render el backend puede fallar si Supabase rechaza nuevas sesiones con `EMAXCONNSESSION max clients reached in session mode`. Para evitarlo se configuro HikariCP con un maximo de 2 conexiones, `minimum-idle=0` y tiempos de vida cortos. Tambien se fijo el dialecto PostgreSQL para que Hibernate no dependa de leer metadata JDBC durante un fallo temporal de conexion.
+
+Render define automaticamente la variable `PORT`; por eso el backend usa:
+
+```properties
+server.port=${PORT:${SERVER_PORT:8080}}
+```
+
+Variables recomendadas en Render:
+
+```env
+SPRING_DATASOURCE_URL=jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require&prepareThreshold=0
+SPRING_DATASOURCE_USERNAME=postgres.nwghyyacoflihtacamip
+SPRING_DATASOURCE_PASSWORD=parcial-2-arquisoft-ssjj
+SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=2
+SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=0
+SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT=10000
+SPRING_DATASOURCE_HIKARI_MAX_LIFETIME=30000
+SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=30000
+SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT=5000
+FRONTEND_URL=https://parcial-2-arquisoft-ssjj.vercel.app
+```
+
+No es necesario definir `SERVER_PORT` en Render. Si se usa el perfil opcional de produccion, agregar:
+
+```env
+SPRING_PROFILES_ACTIVE=prod
+```
+
+Despues de subir los cambios:
+
+```bash
+git add .
+git commit -m "Optimiza pool de conexiones Supabase para despliegue en Render"
+git push origin main
+```
+
+Luego en Render ejecutar `Manual Deploy` -> `Deploy latest commit`.
 
 ## Verificacion final
 
