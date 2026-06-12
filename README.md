@@ -293,7 +293,7 @@ SPRING_DATASOURCE_HIKARI_MAX_LIFETIME=30000
 SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=30000
 SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT=5000
 
-FRONTEND_URL=https://TU-URL-DE-VERCEL.vercel.app
+FRONTEND_URL=https://parcial-2-arquisoft-ssjj.vercel.app/
 
 VITE_API_URL=http://localhost:8080
 VITE_API_ACCEPT=application/vnd.parcial.v1+json
@@ -788,7 +788,7 @@ flowchart LR
 - **Swagger:** https://parcial-2-arquisoft-ssjj.onrender.com/swagger-ui/index.html
 
 ## Frontend
-- **Vercel:** https://TU-URL-DE-VERCEL.vercel.app
+- **Vercel:** https://parcial-2-arquisoft-ssjj.vercel.app/
 
 ---
 
